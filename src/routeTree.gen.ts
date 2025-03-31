@@ -43,14 +43,26 @@ const AuthenticatedTasksIndexLazyImport = createFileRoute(
 const AuthenticatedSettingsIndexLazyImport = createFileRoute(
   '/_authenticated/settings/',
 )()
+const AuthenticatedParticipantsIndexLazyImport = createFileRoute(
+  '/_authenticated/participants/',
+)()
 const AuthenticatedHelpCenterIndexLazyImport = createFileRoute(
   '/_authenticated/help-center/',
 )()
 const AuthenticatedChatsIndexLazyImport = createFileRoute(
   '/_authenticated/chats/',
 )()
+const AuthenticatedCaseManagersIndexLazyImport = createFileRoute(
+  '/_authenticated/case-managers/',
+)()
+const AuthenticatedCaregiversIndexLazyImport = createFileRoute(
+  '/_authenticated/caregivers/',
+)()
 const AuthenticatedAppsIndexLazyImport = createFileRoute(
   '/_authenticated/apps/',
+)()
+const AuthenticatedAgenciesIndexLazyImport = createFileRoute(
+  '/_authenticated/agencies/',
 )()
 const AuthenticatedSettingsNotificationsLazyImport = createFileRoute(
   '/_authenticated/settings/notifications',
@@ -198,6 +210,17 @@ const AuthenticatedSettingsIndexLazyRoute =
     import('./routes/_authenticated/settings/index.lazy').then((d) => d.Route),
   )
 
+const AuthenticatedParticipantsIndexLazyRoute =
+  AuthenticatedParticipantsIndexLazyImport.update({
+    id: '/participants/',
+    path: '/participants/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/participants/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
 const AuthenticatedHelpCenterIndexLazyRoute =
   AuthenticatedHelpCenterIndexLazyImport.update({
     id: '/help-center/',
@@ -218,6 +241,28 @@ const AuthenticatedChatsIndexLazyRoute =
     import('./routes/_authenticated/chats/index.lazy').then((d) => d.Route),
   )
 
+const AuthenticatedCaseManagersIndexLazyRoute =
+  AuthenticatedCaseManagersIndexLazyImport.update({
+    id: '/case-managers/',
+    path: '/case-managers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/case-managers/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const AuthenticatedCaregiversIndexLazyRoute =
+  AuthenticatedCaregiversIndexLazyImport.update({
+    id: '/caregivers/',
+    path: '/caregivers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/caregivers/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
 const AuthenticatedAppsIndexLazyRoute = AuthenticatedAppsIndexLazyImport.update(
   {
     id: '/apps/',
@@ -227,6 +272,15 @@ const AuthenticatedAppsIndexLazyRoute = AuthenticatedAppsIndexLazyImport.update(
 ).lazy(() =>
   import('./routes/_authenticated/apps/index.lazy').then((d) => d.Route),
 )
+
+const AuthenticatedAgenciesIndexLazyRoute =
+  AuthenticatedAgenciesIndexLazyImport.update({
+    id: '/agencies/',
+    path: '/agencies/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any).lazy(() =>
+    import('./routes/_authenticated/agencies/index.lazy').then((d) => d.Route),
+  )
 
 const AuthenticatedSettingsNotificationsLazyRoute =
   AuthenticatedSettingsNotificationsLazyImport.update({
@@ -402,11 +456,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsNotificationsLazyImport
       parentRoute: typeof AuthenticatedSettingsRouteLazyImport
     }
+    '/_authenticated/agencies/': {
+      id: '/_authenticated/agencies/'
+      path: '/agencies'
+      fullPath: '/agencies'
+      preLoaderRoute: typeof AuthenticatedAgenciesIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
       fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/caregivers/': {
+      id: '/_authenticated/caregivers/'
+      path: '/caregivers'
+      fullPath: '/caregivers'
+      preLoaderRoute: typeof AuthenticatedCaregiversIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/case-managers/': {
+      id: '/_authenticated/case-managers/'
+      path: '/case-managers'
+      fullPath: '/case-managers'
+      preLoaderRoute: typeof AuthenticatedCaseManagersIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/chats/': {
@@ -421,6 +496,13 @@ declare module '@tanstack/react-router' {
       path: '/help-center'
       fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexLazyImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/participants/': {
+      id: '/_authenticated/participants/'
+      path: '/participants'
+      fullPath: '/participants'
+      preLoaderRoute: typeof AuthenticatedParticipantsIndexLazyImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/settings/': {
@@ -478,9 +560,13 @@ const AuthenticatedSettingsRouteLazyRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteLazyRoute: typeof AuthenticatedSettingsRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAgenciesIndexLazyRoute: typeof AuthenticatedAgenciesIndexLazyRoute
   AuthenticatedAppsIndexLazyRoute: typeof AuthenticatedAppsIndexLazyRoute
+  AuthenticatedCaregiversIndexLazyRoute: typeof AuthenticatedCaregiversIndexLazyRoute
+  AuthenticatedCaseManagersIndexLazyRoute: typeof AuthenticatedCaseManagersIndexLazyRoute
   AuthenticatedChatsIndexLazyRoute: typeof AuthenticatedChatsIndexLazyRoute
   AuthenticatedHelpCenterIndexLazyRoute: typeof AuthenticatedHelpCenterIndexLazyRoute
+  AuthenticatedParticipantsIndexLazyRoute: typeof AuthenticatedParticipantsIndexLazyRoute
   AuthenticatedTasksIndexLazyRoute: typeof AuthenticatedTasksIndexLazyRoute
   AuthenticatedUsersIndexLazyRoute: typeof AuthenticatedUsersIndexLazyRoute
 }
@@ -489,9 +575,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteLazyRoute:
     AuthenticatedSettingsRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAgenciesIndexLazyRoute: AuthenticatedAgenciesIndexLazyRoute,
   AuthenticatedAppsIndexLazyRoute: AuthenticatedAppsIndexLazyRoute,
+  AuthenticatedCaregiversIndexLazyRoute: AuthenticatedCaregiversIndexLazyRoute,
+  AuthenticatedCaseManagersIndexLazyRoute:
+    AuthenticatedCaseManagersIndexLazyRoute,
   AuthenticatedChatsIndexLazyRoute: AuthenticatedChatsIndexLazyRoute,
   AuthenticatedHelpCenterIndexLazyRoute: AuthenticatedHelpCenterIndexLazyRoute,
+  AuthenticatedParticipantsIndexLazyRoute:
+    AuthenticatedParticipantsIndexLazyRoute,
   AuthenticatedTasksIndexLazyRoute: AuthenticatedTasksIndexLazyRoute,
   AuthenticatedUsersIndexLazyRoute: AuthenticatedUsersIndexLazyRoute,
 }
@@ -517,9 +609,13 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
+  '/agencies': typeof AuthenticatedAgenciesIndexLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
+  '/caregivers': typeof AuthenticatedCaregiversIndexLazyRoute
+  '/case-managers': typeof AuthenticatedCaseManagersIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/participants': typeof AuthenticatedParticipantsIndexLazyRoute
   '/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
@@ -541,9 +637,13 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
+  '/agencies': typeof AuthenticatedAgenciesIndexLazyRoute
   '/apps': typeof AuthenticatedAppsIndexLazyRoute
+  '/caregivers': typeof AuthenticatedCaregiversIndexLazyRoute
+  '/case-managers': typeof AuthenticatedCaseManagersIndexLazyRoute
   '/chats': typeof AuthenticatedChatsIndexLazyRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/participants': typeof AuthenticatedParticipantsIndexLazyRoute
   '/settings': typeof AuthenticatedSettingsIndexLazyRoute
   '/tasks': typeof AuthenticatedTasksIndexLazyRoute
   '/users': typeof AuthenticatedUsersIndexLazyRoute
@@ -569,9 +669,13 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayLazyRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsLazyRoute
+  '/_authenticated/agencies/': typeof AuthenticatedAgenciesIndexLazyRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexLazyRoute
+  '/_authenticated/caregivers/': typeof AuthenticatedCaregiversIndexLazyRoute
+  '/_authenticated/case-managers/': typeof AuthenticatedCaseManagersIndexLazyRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexLazyRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexLazyRoute
+  '/_authenticated/participants/': typeof AuthenticatedParticipantsIndexLazyRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexLazyRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexLazyRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexLazyRoute
@@ -597,9 +701,13 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/agencies'
     | '/apps'
+    | '/caregivers'
+    | '/case-managers'
     | '/chats'
     | '/help-center'
+    | '/participants'
     | '/settings/'
     | '/tasks'
     | '/users'
@@ -620,9 +728,13 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/agencies'
     | '/apps'
+    | '/caregivers'
+    | '/case-managers'
     | '/chats'
     | '/help-center'
+    | '/participants'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -646,9 +758,13 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/agencies/'
     | '/_authenticated/apps/'
+    | '/_authenticated/caregivers/'
+    | '/_authenticated/case-managers/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/participants/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -714,9 +830,13 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/settings",
         "/_authenticated/",
+        "/_authenticated/agencies/",
         "/_authenticated/apps/",
+        "/_authenticated/caregivers/",
+        "/_authenticated/case-managers/",
         "/_authenticated/chats/",
         "/_authenticated/help-center/",
+        "/_authenticated/participants/",
         "/_authenticated/tasks/",
         "/_authenticated/users/"
       ]
@@ -785,8 +905,20 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/settings/notifications.lazy.tsx",
       "parent": "/_authenticated/settings"
     },
+    "/_authenticated/agencies/": {
+      "filePath": "_authenticated/agencies/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
     "/_authenticated/apps/": {
       "filePath": "_authenticated/apps/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/caregivers/": {
+      "filePath": "_authenticated/caregivers/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/case-managers/": {
+      "filePath": "_authenticated/case-managers/index.lazy.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/chats/": {
@@ -795,6 +927,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/help-center/": {
       "filePath": "_authenticated/help-center/index.lazy.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/participants/": {
+      "filePath": "_authenticated/participants/index.lazy.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/settings/": {

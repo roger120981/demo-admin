@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
