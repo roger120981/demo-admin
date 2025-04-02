@@ -9,7 +9,6 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -30,11 +29,12 @@ import React from 'react';
 interface ParticipantsTableProps {
   columns: ColumnDef<Participant>[];
   data: Participant[];
+  totalPages: number; // Nuevo prop
 }
 
-export function ParticipantsTable({ columns, data }: ParticipantsTableProps) {
+export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTableProps) {
   const { page, pageSize, filters, sort, setPage, setPageSize, setFilters, setSort } = useParticipantsStore();
-
+  
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility] = React.useState<VisibilityState>({}); // Eliminado setColumnVisibility
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -50,6 +50,8 @@ export function ParticipantsTable({ columns, data }: ParticipantsTableProps) {
       columnFilters,
       pagination: { pageIndex: page - 1, pageSize },
     },
+    manualPagination: true, // Paginación manual
+    pageCount: totalPages, // Total de páginas desde la API
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: (updater) => {
@@ -73,7 +75,6 @@ export function ParticipantsTable({ columns, data }: ParticipantsTableProps) {
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
