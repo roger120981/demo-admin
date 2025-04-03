@@ -32,15 +32,18 @@ export function ParticipantsFacetedFilter<TData, TValue>({
   options,
   filterCounts,
 }: ParticipantsFacetedFilterProps<TData, TValue>) {
-  // Obtener el valor del filtro y normalizarlo
   const filterValue = column?.getFilterValue();
-  // Si filterValue no es array, convertirlo a un array de un solo elemento o vacío
   const normalizedFilterValue = Array.isArray(filterValue)
     ? filterValue
     : filterValue !== undefined
     ? [filterValue]
     : [];
   const selectedValues = new Set<string>(normalizedFilterValue.map(String));
+
+  const handleClearFilters = () => {
+    column?.setFilterValue(undefined); // Limpiar el filtro de la columna
+    selectedValues.clear(); // Limpiar el estado local
+  };
 
   return (
     <Popover>
@@ -122,7 +125,7 @@ export function ParticipantsFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={handleClearFilters}
                     className="justify-center text-center"
                   >
                     Clear filters

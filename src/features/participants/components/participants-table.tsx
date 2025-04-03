@@ -67,12 +67,14 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
       setColumnFilters(newFilters);
       const filterObj = newFilters.reduce((acc, filter) => {
         const value = Array.isArray(filter.value) ? filter.value : filter.value !== undefined ? [filter.value] : [];
-        if (value.length > 0) {
-          if (filter.id === 'isActive') {
-            acc[filter.id] = value.map((v) => (v === 'true' ? true : v === 'false' ? false : v));
-          } else {
-            acc[filter.id] = value;
-          }
+        if (filter.id === 'isActive') {
+          acc[filter.id] = value.map((v) => (v === 'true' ? true : v === 'false' ? false : v)).filter(Boolean);
+        } else if (filter.id === 'name') {
+          // Asegurar que una cadena vacía se convierta en undefined
+          const nameValue = value[0] === '' ? undefined : value[0];
+          acc[filter.id] = nameValue ? [nameValue] : undefined;
+        } else {
+          acc[filter.id] = value.length > 0 ? value : undefined;
         }
         return acc;
       }, {} as Record<string, (string | boolean)[] | undefined>);
