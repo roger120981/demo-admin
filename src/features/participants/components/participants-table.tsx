@@ -8,7 +8,6 @@ import {
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -29,14 +28,18 @@ import React from 'react';
 interface ParticipantsTableProps {
   columns: ColumnDef<Participant>[];
   data: Participant[];
-  totalPages: number; // Nuevo prop
+  totalPages: number;
+  filterCounts?: {
+    isActive: { true: number; false: number };
+    gender: { M: number; F: number; O: number };
+  };
 }
 
-export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTableProps) {
+export function ParticipantsTable({ columns, data, totalPages, filterCounts }: ParticipantsTableProps) {
   const { page, pageSize, filters, sort, setPage, setPageSize, setFilters, setSort } = useParticipantsStore();
   
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility] = React.useState<VisibilityState>({}); // Eliminado setColumnVisibility
+  const [columnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>(sort ? [{ id: sort.id, desc: sort.desc }] : []);
 
@@ -50,8 +53,8 @@ export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTab
       columnFilters,
       pagination: { pageIndex: page - 1, pageSize },
     },
-    manualPagination: true, // Paginación manual
-    pageCount: totalPages, // Total de páginas desde la API
+    manualPagination: true,
+    pageCount: totalPages,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: (updater) => {
@@ -63,7 +66,14 @@ export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTab
       const newFilters = typeof updater === 'function' ? updater(columnFilters) : updater;
       setColumnFilters(newFilters);
       const filterObj = newFilters.reduce((acc, filter) => {
-        acc[filter.id] = filter.value as string | boolean | undefined;
+        const value = Array.isArray(filter.value) ? filter.value[0] : filter.value;
+        if (value !== undefined) {
+          if (filter.id === 'isActive') {
+            acc[filter.id] = value === 'true' ? true : value === 'false' ? false : value;
+          } else {
+            acc[filter.id] = value;
+          }
+        }
         return acc;
       }, {} as Record<string, string | boolean | undefined>);
       setFilters(filterObj);
@@ -74,7 +84,6 @@ export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTab
       setPageSize(newPagination.pageSize);
     },
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -82,12 +91,12 @@ export function ParticipantsTable({ columns, data, totalPages }: ParticipantsTab
 
   useEffect(() => {
     const initialFilters = Object.entries(filters).map(([id, value]) => ({ id, value }));
-    setColumnFilters(initialFilters);
+    setColumnFilters(initialFilters.length ? initialFilters : []);
   }, [filters]);
 
   return (
     <div className="space-y-4">
-      <ParticipantsToolbar table={table} />
+      <ParticipantsToolbar table={table} filterCounts={filterCounts} columnFilters={columnFilters} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

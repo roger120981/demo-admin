@@ -1,17 +1,31 @@
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { Table } from '@tanstack/react-table';
+import { Table, ColumnFiltersState } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { genderOptions, booleanOptions } from '../data/data';
 import { ParticipantsFacetedFilter } from './participants-faceted-filter';
 import { ParticipantsViewOptions } from './participants-view-options';
+import { useParticipantsStore } from '../stores/participants-store';
+import { useCallback } from 'react';
 
 interface ParticipantsToolbarProps<TData> {
   table: Table<TData>;
+  filterCounts?: {
+    isActive: { true: number; false: number };
+    gender: { M: number; F: number; O: number };
+  };
+  columnFilters: ColumnFiltersState; // Pasamos columnFilters como prop
 }
 
-export function ParticipantsToolbar<TData>({ table }: ParticipantsToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+export function ParticipantsToolbar<TData>({ table, filterCounts, columnFilters }: ParticipantsToolbarProps<TData>) {
+  const isFiltered = columnFilters.length > 0;
+
+  // Manejar el reset
+  const handleReset = useCallback(() => {
+    table.resetColumnFilters();
+    table.setColumnFilters([]);
+    useParticipantsStore.getState().reset();
+  }, [table]);
 
   return (
     <div className="flex items-center justify-between">
@@ -28,6 +42,7 @@ export function ParticipantsToolbar<TData>({ table }: ParticipantsToolbarProps<T
               column={table.getColumn('gender')}
               title="Gender"
               options={genderOptions}
+              filterCounts={filterCounts?.gender}
             />
           )}
           {table.getColumn('isActive') && (
@@ -35,13 +50,14 @@ export function ParticipantsToolbar<TData>({ table }: ParticipantsToolbarProps<T
               column={table.getColumn('isActive')}
               title="Status"
               options={booleanOptions}
+              filterCounts={filterCounts?.isActive}
             />
           )}
         </div>
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={handleReset}
             className="h-8 px-2 lg:px-3"
           >
             Reset

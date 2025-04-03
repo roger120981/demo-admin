@@ -20,7 +20,10 @@ export const useParticipants = () => {
         sortBy: sort?.id,
         sortOrder: sort?.desc ? 'desc' : 'asc',
       };
-      const { data } = await apiClient.get<{ data: Participant[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean }>('/participants', { params });
+      const { data } = await apiClient.get<{ data: Participant[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; filterCounts: {
+        isActive: { true: number; false: number };
+        gender: { M: number; F: number; O: number };
+      }; }>('/participants', { params });
       return data;
     },
     placeholderData: keepPreviousData,

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 import { Column } from '@tanstack/react-table';
 import { cn } from '@/utils/utils';
@@ -23,16 +22,25 @@ import { Separator } from '@/components/ui/separator';
 interface ParticipantsFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
-  options: { label: string; value: string }[];
+  options: { label: string; value: string | boolean }[];
+  filterCounts?: Record<string, number>;
 }
 
 export function ParticipantsFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  filterCounts,
 }: ParticipantsFacetedFilterProps<TData, TValue>) {
-  const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
+  // Obtener el valor del filtro y normalizarlo
+  const filterValue = column?.getFilterValue();
+  // Si filterValue no es array, convertirlo a un array de un solo elemento o vacío
+  const normalizedFilterValue = Array.isArray(filterValue)
+    ? filterValue
+    : filterValue !== undefined
+    ? [filterValue]
+    : [];
+  const selectedValues = new Set<string>(normalizedFilterValue.map(String));
 
   return (
     <Popover>
@@ -40,7 +48,7 @@ export function ParticipantsFacetedFilter<TData, TValue>({
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircledIcon className="h-4 w-4" />
           {title}
-          {selectedValues?.size > 0 && (
+          {selectedValues.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
@@ -53,9 +61,13 @@ export function ParticipantsFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value))
+                    .filter((option) => selectedValues.has(String(option.value)))
                     .map((option) => (
-                      <Badge variant="secondary" key={option.value} className="rounded-sm px-1 font-normal">
+                      <Badge
+                        variant="secondary"
+                        key={String(option.value)}
+                        className="rounded-sm px-1 font-normal"
+                      >
                         {option.label}
                       </Badge>
                     ))
@@ -72,15 +84,16 @@ export function ParticipantsFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option.value);
+                const optionValueStr = String(option.value);
+                const isSelected = selectedValues.has(optionValueStr);
                 return (
                   <CommandItem
-                    key={option.value}
+                    key={optionValueStr}
                     onSelect={() => {
                       if (isSelected) {
-                        selectedValues.delete(option.value);
+                        selectedValues.delete(optionValueStr);
                       } else {
-                        selectedValues.add(option.value);
+                        selectedValues.add(optionValueStr);
                       }
                       const filterValues = Array.from(selectedValues);
                       column?.setFilterValue(filterValues.length ? filterValues : undefined);
@@ -95,9 +108,9 @@ export function ParticipantsFacetedFilter<TData, TValue>({
                       <CheckIcon className={cn('h-4 w-4')} />
                     </div>
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
+                    {filterCounts && filterCounts[optionValueStr] !== undefined && (
                       <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
+                        {filterCounts[optionValueStr]}
                       </span>
                     )}
                   </CommandItem>

@@ -15,7 +15,7 @@ type ParticipantsState = {
 export const useParticipantsStore = create<ParticipantsState>((set) => ({
   page: 1,
   pageSize: 10,
-  filters: { isActive: undefined },
+  filters: { },
   sort: null,
   setPage: (page) => set({ page }),
   setPageSize: (pageSize) => set({ pageSize }),
