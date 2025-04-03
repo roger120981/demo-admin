@@ -10,6 +10,6 @@ export const callTypes = new Map<boolean, string>([
   ];
   
   export const booleanOptions = [
-    { label: 'Yes', value: true },
-    { label: 'No', value: false },
+    { label: 'Active', value: true },
+    { label: 'Inactive', value: false },
   ];
