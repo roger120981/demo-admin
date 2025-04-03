@@ -66,16 +66,16 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
       const newFilters = typeof updater === 'function' ? updater(columnFilters) : updater;
       setColumnFilters(newFilters);
       const filterObj = newFilters.reduce((acc, filter) => {
-        const value = Array.isArray(filter.value) ? filter.value[0] : filter.value;
-        if (value !== undefined) {
+        const value = Array.isArray(filter.value) ? filter.value : filter.value !== undefined ? [filter.value] : [];
+        if (value.length > 0) {
           if (filter.id === 'isActive') {
-            acc[filter.id] = value === 'true' ? true : value === 'false' ? false : value;
+            acc[filter.id] = value.map((v) => (v === 'true' ? true : v === 'false' ? false : v));
           } else {
             acc[filter.id] = value;
           }
         }
         return acc;
-      }, {} as Record<string, string | boolean | undefined>);
+      }, {} as Record<string, (string | boolean)[] | undefined>);
       setFilters(filterObj);
     },
     onPaginationChange: (updater) => {
@@ -90,13 +90,16 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
   });
 
   useEffect(() => {
-    const initialFilters = Object.entries(filters).map(([id, value]) => ({ id, value }));
+    const initialFilters = Object.entries(filters).map(([id, value]) => ({
+      id,
+      value: Array.isArray(value) ? value : value !== undefined ? [value] : [],
+    }));
     setColumnFilters(initialFilters.length ? initialFilters : []);
   }, [filters]);
 
   return (
     <div className="space-y-4">
-      <ParticipantsToolbar table={table} filterCounts={filterCounts} columnFilters={columnFilters} />
+      <ParticipantsToolbar table={table} filterCounts={filterCounts} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

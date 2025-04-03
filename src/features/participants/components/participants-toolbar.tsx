@@ -1,5 +1,5 @@
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { Table, ColumnFiltersState } from '@tanstack/react-table';
+import { Table } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { genderOptions, booleanOptions } from '../data/data';
@@ -14,13 +14,11 @@ interface ParticipantsToolbarProps<TData> {
     isActive: { true: number; false: number };
     gender: { M: number; F: number; O: number };
   };
-  columnFilters: ColumnFiltersState; // Pasamos columnFilters como prop
 }
 
-export function ParticipantsToolbar<TData>({ table, filterCounts, columnFilters }: ParticipantsToolbarProps<TData>) {
-  const isFiltered = columnFilters.length > 0;
+export function ParticipantsToolbar<TData>({ table, filterCounts }: ParticipantsToolbarProps<TData>) {
+  const isFiltered = table.getState().columnFilters.length > 0;
 
-  // Manejar el reset
   const handleReset = useCallback(() => {
     table.resetColumnFilters();
     table.setColumnFilters([]);

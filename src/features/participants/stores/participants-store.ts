@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type ParticipantsState = {
   page: number;
   pageSize: number;
-  filters: Record<string, string | boolean | undefined>;
+  filters: Record<string, (string | boolean)[] | undefined>;
   sort: { id: string; desc: boolean } | null;
   setPage: (page: number) => void;
   setPageSize: (pageSize: number) => void;
@@ -15,11 +15,11 @@ type ParticipantsState = {
 export const useParticipantsStore = create<ParticipantsState>((set) => ({
   page: 1,
   pageSize: 10,
-  filters: { },
+  filters: {},
   sort: null,
   setPage: (page) => set({ page }),
   setPageSize: (pageSize) => set({ pageSize }),
   setFilters: (filters) => set((state) => ({ filters: { ...state.filters, ...filters } })),
   setSort: (sort) => set({ sort }),
-  reset: () => set({ page: 1, pageSize: 10, filters: { isActive: undefined }, sort: null }),
+  reset: () => set({ page: 1, pageSize: 10, filters: {}, sort: null }),
 }));
