@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 import { Column } from '@tanstack/react-table';
 import { cn } from '@/utils/utils';
@@ -7,7 +8,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { useParticipantsStore } from '../stores/participants-store';
 
 interface ParticipantsFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -32,17 +33,35 @@ export function ParticipantsFacetedFilter<TData, TValue>({
   options,
   filterCounts,
 }: ParticipantsFacetedFilterProps<TData, TValue>) {
-  const filterValue = column?.getFilterValue();
-  const normalizedFilterValue = Array.isArray(filterValue)
-    ? filterValue
-    : filterValue !== undefined
-    ? [filterValue]
-    : [];
-  const selectedValues = new Set<string>(normalizedFilterValue.map(String));
+  const { filters, setFilters } = useParticipantsStore();
+  const columnId = column?.id;
+  const [selectedValues, setSelectedValues] = useState<Set<string>>(
+    new Set((column?.getFilterValue() as string[]) || [])
+  );
+
+  // Sincronizar con el filtro de la columna y Zustand
+  useEffect(() => {
+    const filterValue = column?.getFilterValue() as string[] | undefined;
+    const zustandFilter = filters[columnId || ''] as string[] | undefined;
+    const currentValue = filterValue || zustandFilter || [];
+    setSelectedValues(new Set(currentValue));
+  }, [column, columnId, filters]);
+
+  const handleFilterChange = (newValues: string[]) => {
+    const filterValue = newValues.length ? newValues : undefined;
+    column?.setFilterValue(filterValue); // Actualiza TanStack Table (dispara onColumnFiltersChange)
+    if (columnId) {
+      setFilters({ [columnId]: filterValue }); // Actualiza Zustand
+    }
+    setSelectedValues(new Set(newValues));
+  };
 
   const handleClearFilters = () => {
-    column?.setFilterValue(undefined); // Limpiar el filtro de la columna
-    selectedValues.clear(); // Limpiar el estado local
+    column?.setFilterValue(undefined);
+    if (columnId) {
+      setFilters({ [columnId]: undefined });
+    }
+    setSelectedValues(new Set());
   };
 
   return (
@@ -82,7 +101,6 @@ export function ParticipantsFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={title} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
@@ -93,13 +111,14 @@ export function ParticipantsFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={optionValueStr}
                     onSelect={() => {
+                      const newSelectedValues = new Set(selectedValues);
                       if (isSelected) {
-                        selectedValues.delete(optionValueStr);
+                        newSelectedValues.delete(optionValueStr);
                       } else {
-                        selectedValues.add(optionValueStr);
+                        newSelectedValues.add(optionValueStr);
                       }
-                      const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(filterValues.length ? filterValues : undefined);
+                      const filterValues = Array.from(newSelectedValues);
+                      handleFilterChange(filterValues);
                     }}
                   >
                     <div
