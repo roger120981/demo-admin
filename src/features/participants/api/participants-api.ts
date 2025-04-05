@@ -8,7 +8,6 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Tipo para la respuesta paginada de case managers
 type CaseManager = { id: number; name: string; email?: string; phone?: string; agencyId: number; createdAt: string; updatedAt: string };
 type CaseManagersResponse = {
   data: CaseManager[];
@@ -43,7 +42,7 @@ export const useCaseManagersList = () => {
     queryKey: ['case-managers', 'list'],
     queryFn: async () => {
       const { data } = await apiClient.get<CaseManagersResponse>('/case-managers');
-      return data.data; // Devolver solo el array de case managers
+      return data.data;
     },
     placeholderData: keepPreviousData,
   });
@@ -53,8 +52,8 @@ export const useCaregiversList = () => {
   return useQuery({
     queryKey: ['caregivers', 'list'],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ id: number; name: string; email?: string; phone?: string; isActive: boolean }[]>('/caregivers');
-      return data;
+      const { data } = await apiClient.get<{ data: { id: number; name: string; email?: string; phone?: string; isActive: boolean }[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean }>('/caregivers');
+      return data.data; // Extraemos el array de caregivers
     },
     placeholderData: keepPreviousData,
   });
@@ -65,7 +64,7 @@ export const useAgenciesList = () => {
     queryKey: ['agencies', 'list'],
     queryFn: async () => {
       const { data } = await apiClient.get<{ data: { id: number; name: string }[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean }>('/agencies');
-      return data.data; // Extraemos el array de agencias
+      return data.data;
     },
     placeholderData: keepPreviousData,
   });

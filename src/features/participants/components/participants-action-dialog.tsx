@@ -37,6 +37,11 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+type CaregiverField = {
+  value?: number[];
+  onChange: (value: number[]) => void;
+};
+
 export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { currentRow?: Participant; open: boolean; onOpenChange: (open: boolean) => void }) {
   const isEdit = !!currentRow;
   const queryClient = useQueryClient();
@@ -78,6 +83,13 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
 
   const [caseManagerMode, setCaseManagerMode] = React.useState<'connect' | 'create'>('connect');
   const [openCaregiverSelect, setOpenCaregiverSelect] = React.useState(false);
+
+  // Sincronizar caregiverIds al cargar en modo edit
+  React.useEffect(() => {
+    if (isEdit && currentCaregiverIds) {
+      form.setValue('caregiverIds', currentCaregiverIds);
+    }
+  }, [isEdit, currentCaregiverIds, form]);
 
   const createCaseManagerMutation = useMutation({
     mutationFn: async (data: { name: string; email?: string; phone?: string; agencyId: number }) => {
@@ -140,6 +152,11 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     } else {
       toast({ title: 'Error', description: 'Name and Agency are required for a new case manager.', variant: 'destructive' });
     }
+  };
+
+  const handleRemoveCaregiver = (field: CaregiverField, caregiverId: number) => {
+    const currentCaregiverIds = field.value || [];
+    field.onChange(currentCaregiverIds.filter((id) => id !== caregiverId));
   };
 
   if (caseManagersLoading || caregiversLoading || agenciesLoading || (isEdit && caregiverIdsLoading)) {
@@ -340,7 +357,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                   {caseManagerMode === 'connect' && (
                     <Select
                       onValueChange={(value) => field.onChange({ connect: { id: Number(value) } })}
-                      value={field.value?.connect?.id?.toString()} // Usamos value en lugar de defaultValue
+                      value={field.value?.connect?.id?.toString()}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -417,7 +434,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                   <Popover open={openCaregiverSelect} onOpenChange={setOpenCaregiverSelect}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-start">
-                        {field.value?.length ? `${field.value.length} selected` : 'Select caregivers'}
+                        {field.value?.length || 0} selected
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0">
@@ -444,6 +461,28 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  {field.value?.length ? (
+                    <div className="mt-2">
+                      <ul className="space-y-2">
+                        {field.value.map((caregiverId) => {
+                          const caregiver = caregiversArray.find((c) => c.id === caregiverId);
+                          return (
+                            <li key={caregiverId} className="flex items-center justify-between">
+                              <span>{caregiver?.name || 'Unknown Caregiver'}</span>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleRemoveCaregiver(field, caregiverId)}
+                              >
+                                Remove
+                              </Button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
                   <FormMessage />
                 </FormItem>
               )} />
