@@ -67,19 +67,23 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
       setColumnFilters(newFilters);
       const filterObj = newFilters.reduce((acc, filter) => {
         const value = Array.isArray(filter.value) ? filter.value : filter.value !== undefined ? [filter.value] : [];
+        if (value.length === 0) {
+          // Omitir el filtro si el array está vacío
+          return acc;
+        }
         if (filter.id === 'isActive') {
           acc[filter.id] = value.map((v) => (v === 'true' ? true : v === 'false' ? false : v)).filter(Boolean);
         } else if (filter.id === 'name') {
           const nameValue = value[0] === '' ? undefined : value[0];
           acc[filter.id] = nameValue ? [nameValue] : undefined;
         } else {
-          acc[filter.id] = value.length > 0 ? value : undefined;
+          acc[filter.id] = value;
         }
         return acc;
       }, {} as Record<string, (string | boolean)[] | undefined>);
       setFilters(filterObj);
     },
-    onColumnVisibilityChange: setColumnVisibility, // Habilitar manejo de visibilidad
+    onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' ? updater({ pageIndex: page - 1, pageSize }) : updater;
       setPage(newPagination.pageIndex + 1);
