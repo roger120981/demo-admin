@@ -8,6 +8,17 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Tipo para la respuesta paginada de case managers
+type CaseManager = { id: number; name: string; email?: string; phone?: string; agencyId: number; createdAt: string; updatedAt: string };
+type CaseManagersResponse = {
+  data: CaseManager[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNext: boolean;
+};
+
 export const useParticipants = () => {
   const { page, pageSize, filters, sort } = useParticipantsStore();
   return useQuery({
@@ -20,10 +31,7 @@ export const useParticipants = () => {
         sortBy: sort?.id,
         sortOrder: sort?.desc ? 'desc' : 'asc',
       };
-      const { data } = await apiClient.get<{ data: Participant[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; filterCounts: {
-        isActive: { true: number; false: number };
-        gender: { M: number; F: number; O: number };
-      }; }>('/participants', { params });
+      const { data } = await apiClient.get<{ data: Participant[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean; filterCounts: { isActive: { true: number; false: number }; gender: { M: number; F: number; O: number } } }>('/participants', { params });
       return data;
     },
     placeholderData: keepPreviousData,
@@ -34,13 +42,14 @@ export const useCaseManagersList = () => {
   return useQuery({
     queryKey: ['case-managers', 'list'],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ id: number; name: string; email?: string; phone?: string; agencyId: number }[]>('/case-managers');
-      return data;
+      const { data } = await apiClient.get<CaseManagersResponse>('/case-managers');
+      return data.data; // Devolver solo el array de case managers
     },
     placeholderData: keepPreviousData,
   });
 };
 
+// Resto del código sin cambios...
 export const useCaregiversList = () => {
   return useQuery({
     queryKey: ['caregivers', 'list'],

@@ -35,7 +35,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const isEdit = !!currentRow;
   const queryClient = useQueryClient();
 
-  const { data: caseManagers, isLoading: caseManagersLoading } = useCaseManagersList();
+  const { data: caseManagers, isLoading: caseManagersLoading, isError: caseManagersError } = useCaseManagersList();
   const { data: caregivers, isLoading: caregiversLoading } = useCaregiversList();
   const { data: agencies, isLoading: agenciesLoading } = useAgenciesList();
   const { data: currentCaregiverIds, isLoading: caregiverIdsLoading } = useParticipantCaregivers(isEdit ? currentRow?.id : undefined);
@@ -47,11 +47,26 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     defaultValues: isEdit
       ? { ...currentRow, caseManager: { connect: { id: currentRow.cmID } }, caregiverIds: currentCaregiverIds || [] }
       : {
-          name: '', gender: '', medicaidId: '', dob: '', location: '', community: '',
-          address: '', primaryPhone: '', secondaryPhone: '', isActive: true,
-          locStartDate: '', locEndDate: '', pocStartDate: '', pocEndDate: '',
-          units: 0, hours: 0, hdm: false, adhc: false,
-          caseManager: { connect: { id: undefined } }, caregiverIds: [],
+          name: '',
+          gender: '',
+          medicaidId: '',
+          dob: '',
+          location: '',
+          community: '',
+          address: '',
+          primaryPhone: '',
+          secondaryPhone: '',
+          isActive: true,
+          locStartDate: '',
+          locEndDate: '',
+          pocStartDate: '',
+          pocEndDate: '',
+          units: 0,
+          hours: 0,
+          hdm: false,
+          adhc: false,
+          caseManager: { connect: { id: undefined } },
+          caregiverIds: [],
         },
   });
 
@@ -61,14 +76,19 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const onSubmit = async (values: ParticipantForm) => {
     try {
       let participantId: number;
+
+      // Excluimos caregiverIds del payload enviado al POST
+      const { caregiverIds, ...participantData } = values;
+
       if (isEdit) {
-        await update.mutateAsync({ id: currentRow.id, data: values });
+        await update.mutateAsync({ id: currentRow.id, data: participantData });
         participantId = currentRow.id;
       } else {
-        const newParticipant = await create.mutateAsync(values);
+        const newParticipant = await create.mutateAsync(participantData);
         participantId = newParticipant.id;
       }
 
+      // Manejo separado de caregiverIds
       const newCaregiverIds = values.caregiverIds || [];
       const oldCaregiverIds = currentCaregiverIds || [];
 
@@ -91,7 +111,6 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     }
   };
 
-  // Mostrar carga mientras los datos necesarios no estén listos
   if (caseManagersLoading || caregiversLoading || agenciesLoading || (isEdit && caregiverIdsLoading)) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,8 +124,20 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     );
   }
 
-  // Asegurarse de que caseManagers sea un array
-  const caseManagersArray = Array.isArray(caseManagers) ? caseManagers : [];
+  if (caseManagersError) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEdit ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
+            <DialogDescription>Error loading case managers. Please try again.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  const caseManagersArray = caseManagers || [];
   const caregiversArray = Array.isArray(caregivers) ? caregivers : [];
   const agenciesArray = Array.isArray(agencies) ? agencies : [];
 
@@ -286,9 +317,13 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {caseManagersArray.map((cm) => (
-                          <SelectItem key={cm.id} value={cm.id.toString()}>{cm.name}</SelectItem>
-                        ))}
+                        {caseManagersArray.length === 0 ? (
+                          <SelectItem value="" disabled>No case managers available</SelectItem>
+                        ) : (
+                          caseManagersArray.map((cm) => (
+                            <SelectItem key={cm.id} value={cm.id.toString()}>{cm.name}</SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   )}
