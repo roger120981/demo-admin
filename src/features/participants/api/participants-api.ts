@@ -95,7 +95,7 @@ export const useParticipantMutations = () => {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['participants'] }),
     }),
     remove: useMutation({
-      mutationFn: (id: number) => apiClient.delete(`/participants/${id}`),
+      mutationFn: (id: number) => apiClient.delete(`/participants/${id}/permanent`),
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['participants'] }),
     }),
     assignCaregiver: useMutation({
