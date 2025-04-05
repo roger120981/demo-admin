@@ -88,6 +88,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
 
   const [caseManagerMode, setCaseManagerMode] = React.useState<'connect' | 'create'>('connect');
   const [openCaregiverSelect, setOpenCaregiverSelect] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState(''); // Estado para el término de búsqueda
 
   React.useEffect(() => {
     if (isEdit && currentCaregiverIds) {
@@ -192,6 +193,11 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const caseManagersArray = caseManagers || [];
   const caregiversArray = Array.isArray(caregivers) ? caregivers : [];
   const agenciesArray = Array.isArray(agencies) ? agencies : [];
+
+  // Filtrar caregivers según el término de búsqueda
+  const filteredCaregivers = caregiversArray.filter((caregiver) =>
+    caregiver.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Dialog open={open} onOpenChange={(state) => { form.reset(); onOpenChange(state); }}>
@@ -443,10 +449,14 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                     </PopoverTrigger>
                     <PopoverContent className="w-[300px] p-0">
                       <Command>
-                        <CommandInput placeholder="Search caregivers..." />
+                        <CommandInput
+                          placeholder="Search caregivers..."
+                          value={searchTerm}
+                          onValueChange={setSearchTerm} // Actualiza el término de búsqueda
+                        />
                         <CommandEmpty>No caregivers found.</CommandEmpty>
                         <CommandGroup className="max-h-[200px] overflow-y-auto">
-                          {caregiversArray.map((caregiver) => (
+                          {filteredCaregivers.map((caregiver) => (
                             <CommandItem
                               key={caregiver.id}
                               value={caregiver.name}
