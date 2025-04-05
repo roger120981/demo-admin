@@ -1,12 +1,7 @@
-import axios from 'axios';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { Participant, ParticipantForm } from '../data/schema';
 import { useParticipantsStore } from '../stores/participants-store';
-
-const apiClient = axios.create({
-  baseURL: 'http://localhost:4000/api',
-  headers: { 'Content-Type': 'application/json' },
-});
+import { apiClient } from '@/config/axios';
 
 type CaseManager = { id: number; name: string; email?: string; phone?: string; agencyId: number; createdAt: string; updatedAt: string };
 type CaseManagersResponse = {
