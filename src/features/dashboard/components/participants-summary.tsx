@@ -8,11 +8,19 @@ import { cn } from '@/utils/utils';
 import { apiClient } from '@/config/axios';
 
 // Tipos basados en la respuesta real
+interface CaregiverAssignment {
+  participantId: number;
+  caregiverId: number;
+  assignedAt: string;
+  assignedBy: string;
+  caregiver: { id: number; name: string };
+}
+
 interface Participant {
   id: number;
   isActive: boolean;
   cmID: number;
-  caregiverIds?: number[]; // No está presente en /participants, pendiente de resolver
+  caregivers: CaregiverAssignment[];
   name: string;
 }
 
@@ -43,7 +51,7 @@ interface DashboardData {
 const fetchDashboardData = async (): Promise<DashboardData> => {
   const params = {
     page: 1,
-    pageSize: 1000, // Aunque el backend limita a 10, lo dejamos para intentar obtener más
+    pageSize: 1000,
   };
 
   const [participantsRes, caseManagersRes, caregiversRes] = await Promise.all([
@@ -81,7 +89,7 @@ export function ParticipantsSummary() {
     data: [],
     total: 0,
     page: 1,
-    pageSize: 10,
+    pageSize: 1000,
     totalPages: 1,
     hasNext: false,
     filterCounts: { isActive: { true: 0, false: 0 }, gender: { M: 0, F: 0, O: 0 } },
@@ -94,7 +102,7 @@ export function ParticipantsSummary() {
   const activeParticipants = participantsData.filterCounts.isActive.true;
   const inactiveParticipants = participantsData.filterCounts.isActive.false;
   const activeCaseManagers = new Set(participants.map((p) => p.cmID)).size;
-  const assignedCaregivers = new Set(participants.flatMap((p) => p.caregiverIds || [])).size; // Pendiente de resolver
+  const assignedCaregivers = new Set(participants.flatMap((p) => p.caregivers.map((c) => c.caregiverId))).size;
 
   const caseManagerCount = caseManagers.length;
   const caregiverCount = caregivers.length;
