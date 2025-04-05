@@ -340,7 +340,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                   {caseManagerMode === 'connect' && (
                     <Select
                       onValueChange={(value) => field.onChange({ connect: { id: Number(value) } })}
-                      defaultValue={isEdit ? currentRow.cmID.toString() : undefined}
+                      value={field.value?.connect?.id?.toString()} // Usamos value en lugar de defaultValue
                     >
                       <FormControl>
                         <SelectTrigger>
