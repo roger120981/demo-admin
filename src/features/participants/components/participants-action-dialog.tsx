@@ -31,16 +31,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Participant, ParticipantForm, participantFormSchema } from '../data/schema';
 import { useCaseManagersList, useCaregiversList, useAgenciesList, useParticipantMutations, useParticipantCaregivers } from '../api/participants-api';
 import axios from 'axios';
+import { formatDateForInput, CaregiverField } from '@/utils/dateUtils';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:4000/api',
   headers: { 'Content-Type': 'application/json' },
 });
-
-type CaregiverField = {
-  value?: number[];
-  onChange: (value: number[]) => void;
-};
 
 export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { currentRow?: Participant; open: boolean; onOpenChange: (open: boolean) => void }) {
   const isEdit = !!currentRow;
@@ -55,8 +51,17 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
 
   const form = useForm<ParticipantForm>({
     resolver: zodResolver(participantFormSchema),
-    defaultValues: isEdit
-      ? { ...currentRow, caseManager: { connect: { id: currentRow.cmID } }, caregiverIds: currentCaregiverIds || [] }
+    defaultValues: isEdit && currentRow
+      ? {
+          ...currentRow,
+          dob: formatDateForInput(currentRow.dob),
+          locStartDate: formatDateForInput(currentRow.locStartDate),
+          locEndDate: formatDateForInput(currentRow.locEndDate),
+          pocStartDate: formatDateForInput(currentRow.pocStartDate),
+          pocEndDate: formatDateForInput(currentRow.pocEndDate),
+          caseManager: { connect: { id: currentRow.cmID } },
+          caregiverIds: currentCaregiverIds || [],
+        }
       : {
           name: '',
           gender: '',
@@ -84,7 +89,6 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const [caseManagerMode, setCaseManagerMode] = React.useState<'connect' | 'create'>('connect');
   const [openCaregiverSelect, setOpenCaregiverSelect] = React.useState(false);
 
-  // Sincronizar caregiverIds al cargar en modo edit
   React.useEffect(() => {
     if (isEdit && currentCaregiverIds) {
       form.setValue('caregiverIds', currentCaregiverIds);
