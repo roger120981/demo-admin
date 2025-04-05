@@ -64,11 +64,14 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
     },
     onColumnFiltersChange: (updater) => {
       const newFilters = typeof updater === 'function' ? updater(columnFilters) : updater;
-      setColumnFilters(newFilters);
-      const filterObj = newFilters.reduce((acc, filter) => {
+      // Filtrar solo los filtros con valores válidos
+      const activeFilters = newFilters.filter(
+        (filter) => filter.value !== undefined && (Array.isArray(filter.value) ? filter.value.length > 0 : true)
+      );
+      setColumnFilters(activeFilters);
+      const filterObj = activeFilters.reduce((acc, filter) => {
         const value = Array.isArray(filter.value) ? filter.value : filter.value !== undefined ? [filter.value] : [];
         if (value.length === 0) {
-          // Omitir el filtro si el array está vacío
           return acc;
         }
         if (filter.id === 'isActive') {
@@ -99,7 +102,7 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
     const initialFilters = Object.entries(filters).map(([id, value]) => ({
       id,
       value: Array.isArray(value) ? value : value !== undefined ? [value] : [],
-    }));
+    })).filter((filter) => filter.value.length > 0); // Solo filtros con valores
     setColumnFilters(initialFilters.length ? initialFilters : []);
   }, [filters]);
 
