@@ -1,6 +1,5 @@
 'use client';
 
-//import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,11 +16,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown';
 import { Search } from '@/components/search';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { ParticipantsSummary } from './components/participants-summary';
-//import { ParticipantStatus } from './components/participant-status';
-//import { CaseManagerWorkload } from './components/case-manager-workload';
-//import { PocStatus } from './components/poc-status';
-//import { NewParticipantsTrend } from './components/new-participants-trend';
-// import { RecentActivities } from './components/recent-activities';
+import { ParticipantStatus } from './components/participant-status';
 
 export default function Dashboard() {
   return (
@@ -55,22 +50,22 @@ export default function Dashboard() {
           </div>
           <TabsContent value="overview" className="space-y-4">
             <ParticipantsSummary />
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-1 lg:col-span-4">
+            <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+              <Card className="col-span-1">
                 <CardHeader>
                   <CardTitle>Participant Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  
+                  <ParticipantStatus />
                 </CardContent>
               </Card>
-              <Card className="col-span-1 lg:col-span-3">
+              <Card className="col-span-1">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>Last updated participants</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  
+                  {/* Contenido de Recent Activity */}
                 </CardContent>
               </Card>
             </div>
@@ -81,7 +76,7 @@ export default function Dashboard() {
                 <CardTitle>Case Manager Workload</CardTitle>
               </CardHeader>
               <CardContent>
-                
+                {/* Contenido de Case Manager Workload */}
               </CardContent>
             </Card>
           </TabsContent>
@@ -91,7 +86,7 @@ export default function Dashboard() {
                 <CardTitle>POC Status</CardTitle>
               </CardHeader>
               <CardContent>
-                
+                {/* Contenido de POC Status */}
               </CardContent>
             </Card>
           </TabsContent>
@@ -101,7 +96,7 @@ export default function Dashboard() {
                 <CardTitle>New Participants Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                
+                {/* Contenido de New Participants Trend */}
               </CardContent>
             </Card>
           </TabsContent>
