@@ -1,12 +1,9 @@
 'use client';
 
 import React from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,10 +35,10 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const isEdit = !!currentRow;
   const queryClient = useQueryClient();
 
-  const { data: caseManagers } = useCaseManagersList();
-  const { data: caregivers } = useCaregiversList();
-  const { data: agencies } = useAgenciesList();
-  const { data: currentCaregiverIds } = useParticipantCaregivers(isEdit ? currentRow?.id : undefined);
+  const { data: caseManagers, isLoading: caseManagersLoading } = useCaseManagersList();
+  const { data: caregivers, isLoading: caregiversLoading } = useCaregiversList();
+  const { data: agencies, isLoading: agenciesLoading } = useAgenciesList();
+  const { data: currentCaregiverIds, isLoading: caregiverIdsLoading } = useParticipantCaregivers(isEdit ? currentRow?.id : undefined);
 
   const { create, update, assignCaregiver, unassignCaregiver } = useParticipantMutations();
 
@@ -93,6 +90,25 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
       toast({ title: 'Error', description: (error as Error).message, variant: 'destructive' });
     }
   };
+
+  // Mostrar carga mientras los datos necesarios no estén listos
+  if (caseManagersLoading || caregiversLoading || agenciesLoading || (isEdit && caregiverIdsLoading)) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEdit ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
+            <DialogDescription>Loading data...</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Asegurarse de que caseManagers sea un array
+  const caseManagersArray = Array.isArray(caseManagers) ? caseManagers : [];
+  const caregiversArray = Array.isArray(caregivers) ? caregivers : [];
+  const agenciesArray = Array.isArray(agencies) ? agencies : [];
 
   return (
     <Dialog open={open} onOpenChange={(state) => { form.reset(); onOpenChange(state); }}>
@@ -270,7 +286,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {caseManagers?.map((cm) => (
+                        {caseManagersArray.map((cm) => (
                           <SelectItem key={cm.id} value={cm.id.toString()}>{cm.name}</SelectItem>
                         ))}
                       </SelectContent>
@@ -305,7 +321,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                           <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select an agency" /></SelectTrigger></FormControl>
                             <SelectContent>
-                              {agencies?.map((agency) => (
+                              {agenciesArray.map((agency) => (
                                 <SelectItem key={agency.id} value={agency.id.toString()}>{agency.name}</SelectItem>
                               ))}
                             </SelectContent>
@@ -332,7 +348,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                         <CommandInput placeholder="Search caregivers..." />
                         <CommandEmpty>No caregivers found.</CommandEmpty>
                         <CommandGroup className="max-h-[200px] overflow-y-auto">
-                          {caregivers?.map((caregiver) => (
+                          {caregiversArray.map((caregiver) => (
                             <CommandItem
                               key={caregiver.id}
                               value={caregiver.name}
