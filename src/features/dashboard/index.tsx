@@ -17,6 +17,7 @@ import { Search } from '@/components/search';
 import { ThemeSwitch } from '@/components/theme-switch';
 import { ParticipantsSummary } from './components/participants-summary';
 import { ParticipantStatus } from './components/participant-status';
+import { RecentActivity } from './components/recent-activities'; // Importamos el nuevo componente
 
 export default function Dashboard() {
   return (
@@ -64,9 +65,7 @@ export default function Dashboard() {
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>Last updated participants</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  {/* Contenido de Recent Activity */}
-                </CardContent>
+                <RecentActivity /> {/* Añadimos RecentActivity aquí */}
               </Card>
             </div>
           </TabsContent>
