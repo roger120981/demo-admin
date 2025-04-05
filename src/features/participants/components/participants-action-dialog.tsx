@@ -3,7 +3,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +30,12 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Participant, ParticipantForm, participantFormSchema } from '../data/schema';
 import { useCaseManagersList, useCaregiversList, useAgenciesList, useParticipantMutations, useParticipantCaregivers } from '../api/participants-api';
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'http://localhost:4000/api',
+  headers: { 'Content-Type': 'application/json' },
+});
 
 export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { currentRow?: Participant; open: boolean; onOpenChange: (open: boolean) => void }) {
   const isEdit = !!currentRow;
@@ -37,7 +43,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
 
   const { data: caseManagers, isLoading: caseManagersLoading, isError: caseManagersError } = useCaseManagersList();
   const { data: caregivers, isLoading: caregiversLoading } = useCaregiversList();
-  const { data: agencies, isLoading: agenciesLoading } = useAgenciesList();
+  const { data: agencies, isLoading: agenciesLoading, isError: agenciesError } = useAgenciesList();
   const { data: currentCaregiverIds, isLoading: caregiverIdsLoading } = useParticipantCaregivers(isEdit ? currentRow?.id : undefined);
 
   const { create, update, assignCaregiver, unassignCaregiver } = useParticipantMutations();
@@ -73,11 +79,28 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
   const [caseManagerMode, setCaseManagerMode] = React.useState<'connect' | 'create'>('connect');
   const [openCaregiverSelect, setOpenCaregiverSelect] = React.useState(false);
 
+  const createCaseManagerMutation = useMutation({
+    mutationFn: async (data: { name: string; email?: string; phone?: string; agencyId: number }) => {
+      const { data: response } = await apiClient.post<{ success: boolean; message: string; data: { id: number; name: string; email?: string; phone?: string; agencyId: number; createdAt: string; updatedAt: string } }>('/case-managers', data);
+      return response.data;
+    },
+    onSuccess: (newCaseManager) => {
+      queryClient.setQueryData(['case-managers', 'list'], (old: { id: number; name: string; email?: string; phone?: string; agencyId: number; createdAt: string; updatedAt: string }[] | undefined) => {
+        if (!old) return [newCaseManager];
+        return [...old, newCaseManager];
+      });
+      setCaseManagerMode('connect');
+      form.setValue('caseManager', { connect: { id: newCaseManager.id } });
+      toast({ title: 'Case Manager Created', description: `${newCaseManager.name} has been created and selected.` });
+    },
+    onError: (error) => {
+      toast({ title: 'Error', description: (error as Error).message, variant: 'destructive' });
+    },
+  });
+
   const onSubmit = async (values: ParticipantForm) => {
     try {
       let participantId: number;
-
-      // Excluimos caregiverIds del payload enviado al POST
       const { caregiverIds, ...participantData } = values;
 
       if (isEdit) {
@@ -88,7 +111,6 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
         participantId = newParticipant.id;
       }
 
-      // Manejo separado de caregiverIds
       const newCaregiverIds = values.caregiverIds || [];
       const oldCaregiverIds = currentCaregiverIds || [];
 
@@ -111,6 +133,15 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     }
   };
 
+  const handleCreateCaseManager = () => {
+    const caseManagerData = form.getValues('caseManager.create');
+    if (caseManagerData && caseManagerData.name && caseManagerData.agencyId) {
+      createCaseManagerMutation.mutate(caseManagerData);
+    } else {
+      toast({ title: 'Error', description: 'Name and Agency are required for a new case manager.', variant: 'destructive' });
+    }
+  };
+
   if (caseManagersLoading || caregiversLoading || agenciesLoading || (isEdit && caregiverIdsLoading)) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,13 +155,13 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
     );
   }
 
-  if (caseManagersError) {
+  if (caseManagersError || agenciesError) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{isEdit ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
-            <DialogDescription>Error loading case managers. Please try again.</DialogDescription>
+            <DialogDescription>Error loading data. Please try again.</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -147,7 +178,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update participant details.' : 'Create a new participant.'}
+            {isEdit ? 'Update participant details.' : 'Create a new participant. Add a case manager and select it instantly.'}
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-[70vh] overflow-y-auto p-1">
@@ -338,14 +369,14 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                       )} />
                       <FormField control={form.control} name="caseManager.create.email" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Email (optional)</FormLabel>
                           <FormControl><Input type="email" {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )} />
                       <FormField control={form.control} name="caseManager.create.phone" render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone</FormLabel>
+                          <FormLabel>Phone (optional)</FormLabel>
                           <FormControl><Input {...field} /></FormControl>
                           <FormMessage />
                         </FormItem>
@@ -354,16 +385,27 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
                         <FormItem>
                           <FormLabel>Agency</FormLabel>
                           <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
-                            <FormControl><SelectTrigger><SelectValue placeholder="Select an agency" /></SelectTrigger></FormControl>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={agenciesLoading ? 'Loading agencies...' : 'Select an agency'} />
+                              </SelectTrigger>
+                            </FormControl>
                             <SelectContent>
-                              {agenciesArray.map((agency) => (
-                                <SelectItem key={agency.id} value={agency.id.toString()}>{agency.name}</SelectItem>
-                              ))}
+                              {agenciesArray.length === 0 ? (
+                                <SelectItem value="" disabled>No agencies available</SelectItem>
+                              ) : (
+                                agenciesArray.map((agency) => (
+                                  <SelectItem key={agency.id} value={agency.id.toString()}>{agency.name}</SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
                         </FormItem>
                       )} />
+                      <Button type="button" onClick={handleCreateCaseManager} disabled={createCaseManagerMutation.isPending}>
+                        {createCaseManagerMutation.isPending ? 'Saving...' : 'Save Case Manager'}
+                      </Button>
                     </div>
                   )}
                   <FormMessage />
@@ -409,7 +451,7 @@ export function ParticipantsActionDialog({ currentRow, open, onOpenChange }: { c
           </Form>
         </div>
         <DialogFooter>
-          <Button type="submit" form="participant-form">Save</Button>
+          <Button type="submit" form="participant-form" disabled={createCaseManagerMutation.isPending}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

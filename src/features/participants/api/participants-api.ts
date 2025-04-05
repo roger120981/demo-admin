@@ -49,7 +49,6 @@ export const useCaseManagersList = () => {
   });
 };
 
-// Resto del código sin cambios...
 export const useCaregiversList = () => {
   return useQuery({
     queryKey: ['caregivers', 'list'],
@@ -65,8 +64,8 @@ export const useAgenciesList = () => {
   return useQuery({
     queryKey: ['agencies', 'list'],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ id: number; name: string }[]>('/agencies');
-      return data;
+      const { data } = await apiClient.get<{ data: { id: number; name: string }[]; total: number; page: number; pageSize: number; totalPages: number; hasNext: boolean }>('/agencies');
+      return data.data; // Extraemos el array de agencias
     },
     placeholderData: keepPreviousData,
   });
