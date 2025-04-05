@@ -1,7 +1,10 @@
+'use client';
+
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Row } from '@tanstack/react-table';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { Eye } from 'lucide-react'; // Importamos el ícono Eye de lucide-react
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
 } from '@/components/ui/dropdown-menu';
+import { Link } from '@tanstack/react-router';
 import { useParticipantsContext } from '../context/participants-context';
 import { Participant } from '../data/schema';
 
@@ -19,6 +23,7 @@ interface ParticipantsRowActionsProps {
 
 export function ParticipantsRowActions({ row }: ParticipantsRowActionsProps) {
   const { setOpen, setCurrentRow } = useParticipantsContext();
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -28,6 +33,19 @@ export function ParticipantsRowActions({ row }: ParticipantsRowActionsProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
+        {/* Acción View */}
+        <DropdownMenuItem asChild>
+          <Link to="/participants/$id" params={{ id: row.original.id.toString() }}>
+            View
+            <DropdownMenuShortcut>
+              <Eye size={16} />
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        {/* Acción Edit */}
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(row.original);
@@ -39,7 +57,10 @@ export function ParticipantsRowActions({ row }: ParticipantsRowActionsProps) {
             <IconEdit size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
+
         <DropdownMenuSeparator />
+
+        {/* Acción Delete */}
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(row.original);
