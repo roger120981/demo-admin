@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { CardContent } from '@/components/ui/card';
 import { apiClient } from '@/config/axios';
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from '@tanstack/react-router';
 
 interface Participant {
   id: number;
@@ -85,7 +86,13 @@ export function RecentActivity() {
                   <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{participant.name}</p>
+                  <Link
+                    to="/participants/$id"
+                    params={{ id: participant.id.toString() }}
+                    className="text-sm font-medium hover:underline"
+                  >
+                    {participant.name}
+                  </Link>
                   <p className="text-xs text-muted-foreground">
                     <span className={actionColor}>{action}</span>{' '}
                     {formatDistanceToNow(new Date(participant.updatedAt), { addSuffix: true })}
