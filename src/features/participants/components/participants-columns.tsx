@@ -36,8 +36,8 @@ export const columns: ColumnDef<Participant>[] = [
         className="translate-y-[2px]"
       />
     ),
-    enableSorting: false,
-    enableHiding: false,
+    enableSorting: false, // No tiene sentido ordenar una columna de selección
+    enableHiding: false, // No ocultar esta columna esencial
   },
   {
     accessorKey: 'name',
@@ -54,7 +54,8 @@ export const columns: ColumnDef<Participant>[] = [
         'sticky left-6 md:table-cell'
       ),
     },
-    enableHiding: false,
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     accessorKey: 'medicaidId',
@@ -64,6 +65,8 @@ export const columns: ColumnDef<Participant>[] = [
     cell: ({ row }) => (
       <div className="w-fit text-nowrap">{row.getValue('medicaidId')}</div>
     ),
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     accessorKey: 'gender',
@@ -74,7 +77,8 @@ export const columns: ColumnDef<Participant>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-    enableSorting: false,
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     accessorKey: 'isActive',
@@ -82,7 +86,7 @@ export const columns: ColumnDef<Participant>[] = [
       <ParticipantsColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const isActive = row.getValue<boolean>('isActive'); // Tipado explícito como boolean
+      const isActive = row.getValue<boolean>('isActive');
       const badgeColor = callTypes.get(isActive);
       return (
         <div className="flex space-x-2">
@@ -95,8 +99,8 @@ export const columns: ColumnDef<Participant>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-    enableHiding: false,
-    enableSorting: false,
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     accessorKey: 'location',
@@ -104,7 +108,8 @@ export const columns: ColumnDef<Participant>[] = [
       <ParticipantsColumnHeader column={column} title="Location" />
     ),
     cell: ({ row }) => <div>{row.getValue('location')}</div>,
-    enableSorting: false,
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     accessorKey: 'primaryPhone',
@@ -112,10 +117,13 @@ export const columns: ColumnDef<Participant>[] = [
       <ParticipantsColumnHeader column={column} title="Primary Phone" />
     ),
     cell: ({ row }) => <div>{row.getValue('primaryPhone')}</div>,
-    enableSorting: false,
+    enableSorting: true, // Habilitar ordenamiento
+    enableHiding: true, // Habilitar ocultamiento
   },
   {
     id: 'actions',
     cell: ({ row }) => <ParticipantsRowActions row={row} />,
+    enableSorting: false, // No tiene sentido ordenar acciones
+    enableHiding: false, // No ocultar acciones
   },
 ];

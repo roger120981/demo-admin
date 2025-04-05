@@ -39,7 +39,7 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
   const { page, pageSize, filters, sort, setPage, setPageSize, setFilters, setSort } = useParticipantsStore();
   
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>(sort ? [{ id: sort.id, desc: sort.desc }] : []);
 
@@ -70,7 +70,6 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
         if (filter.id === 'isActive') {
           acc[filter.id] = value.map((v) => (v === 'true' ? true : v === 'false' ? false : v)).filter(Boolean);
         } else if (filter.id === 'name') {
-          // Asegurar que una cadena vacía se convierta en undefined
           const nameValue = value[0] === '' ? undefined : value[0];
           acc[filter.id] = nameValue ? [nameValue] : undefined;
         } else {
@@ -80,6 +79,7 @@ export function ParticipantsTable({ columns, data, totalPages, filterCounts }: P
       }, {} as Record<string, (string | boolean)[] | undefined>);
       setFilters(filterObj);
     },
+    onColumnVisibilityChange: setColumnVisibility, // Habilitar manejo de visibilidad
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' ? updater({ pageIndex: page - 1, pageSize }) : updater;
       setPage(newPagination.pageIndex + 1);
