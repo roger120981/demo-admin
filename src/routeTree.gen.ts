@@ -19,6 +19,7 @@ import { Route as authSignInImport } from './routes/(auth)/sign-in'
 import { Route as authOtpImport } from './routes/(auth)/otp'
 import { Route as auth500Import } from './routes/(auth)/500'
 import { Route as AuthenticatedParticipantsIdImport } from './routes/_authenticated/participants/$id'
+import { Route as AuthenticatedAgenciesIdImport } from './routes/_authenticated/agencies/$id'
 
 // Create Virtual Routes
 
@@ -334,6 +335,12 @@ const AuthenticatedParticipantsIdRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
+const AuthenticatedAgenciesIdRoute = AuthenticatedAgenciesIdImport.update({
+  id: '/agencies/$id',
+  path: '/agencies/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -434,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/agencies/$id': {
+      id: '/_authenticated/agencies/$id'
+      path: '/agencies/$id'
+      fullPath: '/agencies/$id'
+      preLoaderRoute: typeof AuthenticatedAgenciesIdImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/participants/$id': {
@@ -575,6 +589,7 @@ const AuthenticatedSettingsRouteLazyRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteLazyRoute: typeof AuthenticatedSettingsRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAgenciesIdRoute: typeof AuthenticatedAgenciesIdRoute
   AuthenticatedParticipantsIdRoute: typeof AuthenticatedParticipantsIdRoute
   AuthenticatedAgenciesIndexLazyRoute: typeof AuthenticatedAgenciesIndexLazyRoute
   AuthenticatedAppsIndexLazyRoute: typeof AuthenticatedAppsIndexLazyRoute
@@ -591,6 +606,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteLazyRoute:
     AuthenticatedSettingsRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAgenciesIdRoute: AuthenticatedAgenciesIdRoute,
   AuthenticatedParticipantsIdRoute: AuthenticatedParticipantsIdRoute,
   AuthenticatedAgenciesIndexLazyRoute: AuthenticatedAgenciesIndexLazyRoute,
   AuthenticatedAppsIndexLazyRoute: AuthenticatedAppsIndexLazyRoute,
@@ -622,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
+  '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -651,6 +668,7 @@ export interface FileRoutesByTo {
   '/404': typeof errors404LazyRoute
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
+  '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -684,6 +702,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500LazyRoute
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/agencies/$id': typeof AuthenticatedAgenciesIdRoute
   '/_authenticated/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -717,6 +736,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/503'
     | '/'
+    | '/agencies/$id'
     | '/participants/$id'
     | '/settings/account'
     | '/settings/appearance'
@@ -745,6 +765,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/503'
     | '/'
+    | '/agencies/$id'
     | '/participants/$id'
     | '/settings/account'
     | '/settings/appearance'
@@ -776,6 +797,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/agencies/$id'
     | '/_authenticated/participants/$id'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -853,6 +875,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authenticated/settings",
         "/_authenticated/",
+        "/_authenticated/agencies/$id",
         "/_authenticated/participants/$id",
         "/_authenticated/agencies/",
         "/_authenticated/apps/",
@@ -911,6 +934,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/agencies/$id": {
+      "filePath": "_authenticated/agencies/$id.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/participants/$id": {
