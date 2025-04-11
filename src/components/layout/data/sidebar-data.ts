@@ -46,6 +46,11 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
+          title: 'Agencies',
+          url: '/agencies',
+          icon: IconLayoutDashboard,
+        },
+        {
           title: 'Participants',
           url: '/participants',
           icon: IconUsersGroup,
