@@ -20,6 +20,7 @@ import { Route as authOtpImport } from './routes/(auth)/otp'
 import { Route as auth500Import } from './routes/(auth)/500'
 import { Route as AuthenticatedParticipantsIdImport } from './routes/_authenticated/participants/$id'
 import { Route as AuthenticatedCaseManagersIdImport } from './routes/_authenticated/case-managers/$id'
+import { Route as AuthenticatedCaregiversIdImport } from './routes/_authenticated/caregivers/$id'
 import { Route as AuthenticatedAgenciesIdImport } from './routes/_authenticated/agencies/$id'
 
 // Create Virtual Routes
@@ -343,6 +344,12 @@ const AuthenticatedCaseManagersIdRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
+const AuthenticatedCaregiversIdRoute = AuthenticatedCaregiversIdImport.update({
+  id: '/caregivers/$id',
+  path: '/caregivers/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+
 const AuthenticatedAgenciesIdRoute = AuthenticatedAgenciesIdImport.update({
   id: '/agencies/$id',
   path: '/agencies/$id',
@@ -456,6 +463,13 @@ declare module '@tanstack/react-router' {
       path: '/agencies/$id'
       fullPath: '/agencies/$id'
       preLoaderRoute: typeof AuthenticatedAgenciesIdImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/caregivers/$id': {
+      id: '/_authenticated/caregivers/$id'
+      path: '/caregivers/$id'
+      fullPath: '/caregivers/$id'
+      preLoaderRoute: typeof AuthenticatedCaregiversIdImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/case-managers/$id': {
@@ -605,6 +619,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteLazyRoute: typeof AuthenticatedSettingsRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAgenciesIdRoute: typeof AuthenticatedAgenciesIdRoute
+  AuthenticatedCaregiversIdRoute: typeof AuthenticatedCaregiversIdRoute
   AuthenticatedCaseManagersIdRoute: typeof AuthenticatedCaseManagersIdRoute
   AuthenticatedParticipantsIdRoute: typeof AuthenticatedParticipantsIdRoute
   AuthenticatedAgenciesIndexLazyRoute: typeof AuthenticatedAgenciesIndexLazyRoute
@@ -623,6 +638,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSettingsRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAgenciesIdRoute: AuthenticatedAgenciesIdRoute,
+  AuthenticatedCaregiversIdRoute: AuthenticatedCaregiversIdRoute,
   AuthenticatedCaseManagersIdRoute: AuthenticatedCaseManagersIdRoute,
   AuthenticatedParticipantsIdRoute: AuthenticatedParticipantsIdRoute,
   AuthenticatedAgenciesIndexLazyRoute: AuthenticatedAgenciesIndexLazyRoute,
@@ -656,6 +672,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/caregivers/$id': typeof AuthenticatedCaregiversIdRoute
   '/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
@@ -687,6 +704,7 @@ export interface FileRoutesByTo {
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/caregivers/$id': typeof AuthenticatedCaregiversIdRoute
   '/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
@@ -722,6 +740,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/_authenticated/caregivers/$id': typeof AuthenticatedCaregiversIdRoute
   '/_authenticated/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/_authenticated/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
@@ -757,6 +776,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/agencies/$id'
+    | '/caregivers/$id'
     | '/case-managers/$id'
     | '/participants/$id'
     | '/settings/account'
@@ -787,6 +807,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/agencies/$id'
+    | '/caregivers/$id'
     | '/case-managers/$id'
     | '/participants/$id'
     | '/settings/account'
@@ -820,6 +841,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/agencies/$id'
+    | '/_authenticated/caregivers/$id'
     | '/_authenticated/case-managers/$id'
     | '/_authenticated/participants/$id'
     | '/_authenticated/settings/account'
@@ -899,6 +921,7 @@ export const routeTree = rootRoute
         "/_authenticated/settings",
         "/_authenticated/",
         "/_authenticated/agencies/$id",
+        "/_authenticated/caregivers/$id",
         "/_authenticated/case-managers/$id",
         "/_authenticated/participants/$id",
         "/_authenticated/agencies/",
@@ -962,6 +985,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/agencies/$id": {
       "filePath": "_authenticated/agencies/$id.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/caregivers/$id": {
+      "filePath": "_authenticated/caregivers/$id.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/case-managers/$id": {

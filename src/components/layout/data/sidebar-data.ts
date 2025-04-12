@@ -10,6 +10,7 @@ import {
   IconUsers,
   IconUsersGroup,
   IconHomeHeart,
+  IconUserHeart,
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
@@ -50,6 +51,12 @@ export const sidebarData: SidebarData = {
           title: 'Participants',
           url: '/participants',
           icon: IconUsersGroup,
+        },
+        
+        {
+          title: 'Caregivers',
+          url: '/caregivers',
+          icon: IconUserHeart,
         },
         {
           title: 'Case Managers',
