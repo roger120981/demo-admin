@@ -27,6 +27,7 @@ interface CaseManagerDetails {
   email: string | null;
   phone: string | null;
   agencyId: number;
+  agency: { id: number; name: string } | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -140,8 +141,8 @@ export function CaseManagersDetails() {
                     <dd className="text-sm">{caseManager.phone || 'N/A'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-muted-foreground/80">Agency ID</dt>
-                    <dd className="text-sm">{caseManager.agencyId}</dd>
+                    <dt className="text-sm font-medium text-muted-foreground/80">Agency</dt>
+                    <dd className="text-sm">{caseManager.agency?.name || 'N/A'}</dd>
                   </div>
                 </dl>
               </div>

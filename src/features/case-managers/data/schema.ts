@@ -1,13 +1,19 @@
 import { z } from 'zod';
 
+const agencySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
 const caseManagerSchema = z.object({
   id: z.number(),
   name: z.string(),
-  email: z.string().optional(),
-  phone: z.string().optional(),
+  email: z.string().nullable(),
+  phone: z.string().nullable(),
   agencyId: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  agency: agencySchema.optional(),
 });
 
 export type CaseManager = z.infer<typeof caseManagerSchema>;

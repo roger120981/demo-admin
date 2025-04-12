@@ -78,12 +78,13 @@ export const columns: ColumnDef<CaseManager>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: 'agencyId',
+    accessorKey: 'agency.name',
+    id: 'agencyName',
     header: ({ column }) => (
-      <CaseManagersColumnHeader column={column} title="Agency ID" />
+      <CaseManagersColumnHeader column={column} title="Agency" />
     ),
     cell: ({ row }) => (
-      <div>{row.getValue('agencyId')}</div>
+      <div>{row.original.agency?.name || 'N/A'}</div>
     ),
     enableSorting: true,
     enableHiding: true,
