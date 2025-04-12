@@ -47,14 +47,19 @@ export const sidebarData: SidebarData = {
           icon: IconLayoutDashboard,
         },
         {
-          title: 'Agencies',
-          url: '/agencies',
-          icon: IconHomeHeart,
-        },
-        {
           title: 'Participants',
           url: '/participants',
           icon: IconUsersGroup,
+        },
+        {
+          title: 'Case Managers',
+          url: '/case-managers',
+          icon: IconUserCog,
+        },
+        {
+          title: 'Agencies',
+          url: '/agencies',
+          icon: IconHomeHeart,
         },
         {
           title: 'Users',

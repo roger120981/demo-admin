@@ -19,6 +19,7 @@ import { Route as authSignInImport } from './routes/(auth)/sign-in'
 import { Route as authOtpImport } from './routes/(auth)/otp'
 import { Route as auth500Import } from './routes/(auth)/500'
 import { Route as AuthenticatedParticipantsIdImport } from './routes/_authenticated/participants/$id'
+import { Route as AuthenticatedCaseManagersIdImport } from './routes/_authenticated/case-managers/$id'
 import { Route as AuthenticatedAgenciesIdImport } from './routes/_authenticated/agencies/$id'
 
 // Create Virtual Routes
@@ -335,6 +336,13 @@ const AuthenticatedParticipantsIdRoute =
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
+const AuthenticatedCaseManagersIdRoute =
+  AuthenticatedCaseManagersIdImport.update({
+    id: '/case-managers/$id',
+    path: '/case-managers/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+
 const AuthenticatedAgenciesIdRoute = AuthenticatedAgenciesIdImport.update({
   id: '/agencies/$id',
   path: '/agencies/$id',
@@ -448,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/agencies/$id'
       fullPath: '/agencies/$id'
       preLoaderRoute: typeof AuthenticatedAgenciesIdImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
+    '/_authenticated/case-managers/$id': {
+      id: '/_authenticated/case-managers/$id'
+      path: '/case-managers/$id'
+      fullPath: '/case-managers/$id'
+      preLoaderRoute: typeof AuthenticatedCaseManagersIdImport
       parentRoute: typeof AuthenticatedRouteImport
     }
     '/_authenticated/participants/$id': {
@@ -590,6 +605,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteLazyRoute: typeof AuthenticatedSettingsRouteLazyRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAgenciesIdRoute: typeof AuthenticatedAgenciesIdRoute
+  AuthenticatedCaseManagersIdRoute: typeof AuthenticatedCaseManagersIdRoute
   AuthenticatedParticipantsIdRoute: typeof AuthenticatedParticipantsIdRoute
   AuthenticatedAgenciesIndexLazyRoute: typeof AuthenticatedAgenciesIndexLazyRoute
   AuthenticatedAppsIndexLazyRoute: typeof AuthenticatedAppsIndexLazyRoute
@@ -607,6 +623,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSettingsRouteLazyRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAgenciesIdRoute: AuthenticatedAgenciesIdRoute,
+  AuthenticatedCaseManagersIdRoute: AuthenticatedCaseManagersIdRoute,
   AuthenticatedParticipantsIdRoute: AuthenticatedParticipantsIdRoute,
   AuthenticatedAgenciesIndexLazyRoute: AuthenticatedAgenciesIndexLazyRoute,
   AuthenticatedAppsIndexLazyRoute: AuthenticatedAppsIndexLazyRoute,
@@ -639,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -669,6 +687,7 @@ export interface FileRoutesByTo {
   '/503': typeof errors503LazyRoute
   '/': typeof AuthenticatedIndexRoute
   '/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -703,6 +722,7 @@ export interface FileRoutesById {
   '/(errors)/503': typeof errors503LazyRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/agencies/$id': typeof AuthenticatedAgenciesIdRoute
+  '/_authenticated/case-managers/$id': typeof AuthenticatedCaseManagersIdRoute
   '/_authenticated/participants/$id': typeof AuthenticatedParticipantsIdRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountLazyRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceLazyRoute
@@ -737,6 +757,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/agencies/$id'
+    | '/case-managers/$id'
     | '/participants/$id'
     | '/settings/account'
     | '/settings/appearance'
@@ -766,6 +787,7 @@ export interface FileRouteTypes {
     | '/503'
     | '/'
     | '/agencies/$id'
+    | '/case-managers/$id'
     | '/participants/$id'
     | '/settings/account'
     | '/settings/appearance'
@@ -798,6 +820,7 @@ export interface FileRouteTypes {
     | '/(errors)/503'
     | '/_authenticated/'
     | '/_authenticated/agencies/$id'
+    | '/_authenticated/case-managers/$id'
     | '/_authenticated/participants/$id'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -876,6 +899,7 @@ export const routeTree = rootRoute
         "/_authenticated/settings",
         "/_authenticated/",
         "/_authenticated/agencies/$id",
+        "/_authenticated/case-managers/$id",
         "/_authenticated/participants/$id",
         "/_authenticated/agencies/",
         "/_authenticated/apps/",
@@ -938,6 +962,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/agencies/$id": {
       "filePath": "_authenticated/agencies/$id.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/case-managers/$id": {
+      "filePath": "_authenticated/case-managers/$id.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/participants/$id": {
