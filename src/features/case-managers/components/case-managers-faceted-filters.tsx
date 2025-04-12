@@ -24,15 +24,17 @@ interface CaseManagersFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
   options: { label: string; value: string }[];
+  filterKey?: string;
 }
 
 export function CaseManagersFacetedFilter<TData, TValue>({
   column,
   title,
   options,
+  filterKey,
 }: CaseManagersFacetedFilterProps<TData, TValue>) {
   const { filters, setFilters } = useCaseManagersStore();
-  const columnId = column?.id;
+  const columnId = filterKey || column?.id;
   const [selectedValues, setSelectedValues] = useState<Set<string>>(
     new Set((column?.getFilterValue() as string[]) || [])
   );
@@ -47,7 +49,10 @@ export function CaseManagersFacetedFilter<TData, TValue>({
 
   const handleFilterChange = (newValues: string[]) => {
     const filterValue = newValues.length ? newValues : undefined;
-    column?.setFilterValue(filterValue); // Actualiza TanStack Table
+    // Solo actualizamos la columna si no hay filterKey definido
+    if (!filterKey) {
+      column?.setFilterValue(filterValue); // Actualiza TanStack Table
+    }
     if (columnId) {
       setFilters({ [columnId]: filterValue }); // Actualiza Zustand
     }
@@ -55,7 +60,9 @@ export function CaseManagersFacetedFilter<TData, TValue>({
   };
 
   const handleClearFilters = () => {
-    column?.setFilterValue(undefined);
+    if (!filterKey) {
+      column?.setFilterValue(undefined);
+    }
     if (columnId) {
       setFilters({ [columnId]: undefined });
     }
